@@ -1,16 +1,12 @@
 package com.example.littlechemist3
 
-import android.graphics.Color
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Shape
 
 //import android.graphics.drawable.shapes.Shape
 
 /**
  * all data needed for drawing
  * @param point The coordinates
- * @param s Shape
  * @param tb ToolboxItem - What to draw
  * @param Current Is this newest member in chain (defaults false)
  */

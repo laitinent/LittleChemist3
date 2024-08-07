@@ -6,6 +6,7 @@ import kotlin.math.abs
 
 class Node(text:String)
 {
+
     var Text = text.uppercase(Locale.getDefault())
     var Id:Int = 0
         //get() {            TODO()        }
@@ -34,6 +35,7 @@ class Node(text:String)
             "C" -> 4
             "O" -> 2
             "N" -> 3
+            "Ca" -> 2
             else -> 0
         }
     }
@@ -66,24 +68,26 @@ class Node(text:String)
 
     private fun  AddBonds(n:Double)
     {
-        if (n.toInt() in 1..4) { // so far 4+ bonds not supported
-            BondCount += n
+        when {
+            n.toInt() in 1..4 -> { // so far 4+ bonds not supported
+                BondCount += n
+            }
         }
     }
 
-    fun IsFull(text:String?=null):Boolean
+    fun IsFull():Boolean
     {
         //checks also nodes with 2+ bonds
         var cnt = 0.0
-        for ( n in Nodes) { cnt += CheckSpecialBond(Text, n.Text) }
+        //for ( n in Nodes) { cnt += CheckSpecialBond(Text, n.Text) }
+        Nodes.forEach { cnt += CheckSpecialBond(Text, it.Text) }
         return abs(MaxNodes.toDouble()) - cnt < 1.0  //cnt == MaxNodes.toDouble();
     }
 
     private fun FreeBonds():Double
     {
         //checks also nodes with 2+ bonds
-        var cnt = 0.0
-        for ( n in Nodes) { cnt += CheckSpecialBond(Text, n.Text) }
+        val cnt = Nodes.sumOf { CheckSpecialBond(Text, it.Text) }
         return abs(MaxNodes.toDouble()) - cnt  //cnt == MaxNodes.toDouble();
     }
 
@@ -99,23 +103,27 @@ class Node(text:String)
             currentId = 1
         }
 
-        /// <summary>
-        /// Double etc bonding. Param order doesn't matter. Note: not same as max nodes
-        /// </summary>
-        /// <param name="from">First node text</param>
-        /// <param name="to">Second node text</param>
-        /// <returns>Bond count, default 1</returns>
+        /**
+        * Double etc bonding. Param order doesn't matter. Note: not same as max nodes
+        * @param from  First node text
+        * @param to Second node text
+        * @returns Bond count, default 1
+         * */
         fun CheckSpecialBond(from:String, to:String):Double
         {
-            if ((from == "C" || to == "C") && from != to) {
-                //if ((from == "C" && to == "O") || (from == "O" && to == "C"))
-                if (to == "O" || from == "O") { return 2.0  }
-                if (to == "N" || from == "N") { return 3.0  }
+            when {
+                (from == "C" || to == "C") && from != to -> {
+                    //if ((from == "C" && to == "O") || (from == "O" && to == "C"))
+                    if (to == "O" || from == "O") { return 2.0  }
+                    if (to == "N" || from == "N") { return 3.0  }
+                }
             }
 
             //TODO: how about others than HNO3
-            if ((from == "N" || to == "N") && from != to) {
-                if (to == "O" || from == "O") { return 1.5 }
+            when {
+                (from == "N" || to == "N") && from != to -> {
+                    if (to == "O" || from == "O") { return 1.5 }
+                }
             }
             return 1.0
         }

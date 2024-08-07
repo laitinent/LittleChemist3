@@ -30,7 +30,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -66,7 +65,7 @@ import retrofit2.http.GET
 
 interface GitHubService {
     @GET("moleculelist.csv")
-    fun listRepos(/*@Path("user") user: String?*/): Call<String?>?
+    fun listRepos(/*@Path("user") user: String?*/): Call<String?>?  // could be "suspend"
 }
 
 class MainActivity : ComponentActivity() {
@@ -81,13 +80,12 @@ class MainActivity : ComponentActivity() {
             ToolBoxItem2("N", Color.BLUE, R.drawable.blueball),
             ToolBoxItem2("O", Color.RED, R.drawable.redball),
             ToolBoxItem2("C", Color.BLACK, R.drawable.gray),
-            ToolBoxItem2("OH", Color.WHITE, R.drawable.lightgray)
+            ToolBoxItem2("OH", Color.WHITE, R.drawable.lightgray),
+            ToolBoxItem2("Ca", Color.GRAY, R.drawable.lightgray)
         )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //var rv: String = ""
-        //val lista = GetRestData("https://meri.digitraffic.fi/api/v1/",rv)  //https://laitinent.github.io/")
         getRestData("https://laitinent.github.io/" /*, response,app*/)
         setContent {
             LittleChemist3Theme {
@@ -96,8 +94,6 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    //Greeting("hello",lista)
-                    //GetDataUI("https://meri.digitraffic.fi/api/v1/")
                     GetDataUI(/*app.value,"https://laitinent.github.io/",*/ images)
                 }
             }
@@ -112,33 +108,34 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun GetDataUI(/*app: ChainSystem, url: String, */ images: Array<ToolBoxItem2>) {
 
-    //val response = remember {  mutableStateOf("")   }  // used for testing
-
-    var offset = remember { mutableStateOf(Offset.Zero) }
+    var offset = remember { mutableStateOf(Offset.Zero) } //used as parameter, must be = (not by)
     var selected by remember { mutableStateOf(images[0]) }
     var textNote = remember { mutableStateOf("--") }
     var previousPoint = remember { mutableStateOf(Offset.Zero) }
-    //var selectedPoint = Offset.Zero//PointF()
-    var image: ImageBitmap?
     val list2 = remember { mutableStateListOf<VisualNode>() }
 
     //if (selected != null) {
-    image = ImageBitmap.imageResource(selected.drawableResId)
+    //var selectedPoint = Offset.Zero//PointF()
+    var image: ImageBitmap? = ImageBitmap.imageResource(selected.drawableResId)
     //}
 
     val imageResources = mutableListOf<ImageBitmap>()
     for (res in images) {
-        imageResources.add(ImageBitmap.imageResource(res.drawableResId))
+        imageResources.add(ImageBitmap.imageResource(res.drawableResId)) //vxcfdsew
     }
 
     //getRestData(url, /*response,*/ app)
     Column {
         LazyRow {
             items(images) {
-                Image(painterResource(id = it.drawableResId), it.text, modifier = Modifier
-                    .selectable(false) { selected = it }
-                    .size(50.dp, 50.dp)
+                Image(
+                    painter = painterResource(it.drawableResId),
+                    contentDescription = it.text,
+                    modifier = Modifier
+                        .selectable(false) { selected = it }
+                        .size(50.dp, 50.dp)
                 )
+
             }
         }
 
@@ -178,7 +175,7 @@ fun GetDataUI(/*app: ChainSystem, url: String, */ images: Array<ToolBoxItem2>) {
         {
             //if (image != null)
             //{
-            val io = IntOffset(offset.value.x.toLong().toInt(), offset.value.y.toLong().toInt())
+            //val io = IntOffset(offset.value.x.toLong().toInt(), offset.value.y.toLong().toInt())
             //Log.d("canvas","Int: $io.toString()")
             //see https://developer.android.com/jetpack/compose/graphics/images/custompainter
             /*drawImage(
@@ -190,7 +187,7 @@ fun GetDataUI(/*app: ChainSystem, url: String, */ images: Array<ToolBoxItem2>) {
             )*/
             //}
             Log.d("COUNT", VisualElements.lista.size.toString() + " nodes")
-            for (vnode in VisualElements.lista) {
+            VisualElements.lista.forEach { vnode ->
                 val d = images.toList().find { it.drawableResId == vnode.tb.drawableResId }
                 val index = images.toList().indexOf(d)
                 val r = imageResources[index]
@@ -199,11 +196,12 @@ fun GetDataUI(/*app: ChainSystem, url: String, */ images: Array<ToolBoxItem2>) {
                 drawGraphNode(vnode, r, tm)
             }
             VisualElements.lines.forEach { l ->
+                //.dp.toPx() added for display compatibility
                 drawLine(
                     androidx.compose.ui.graphics.Color.Black,
-                    Offset(l.left, l.top),
-                    Offset(l.right, l.bottom),
-                    5f
+                    Offset(l.left.dp.toPx(), l.top.dp.toPx()),
+                    Offset(l.right.dp.toPx(), l.bottom.dp.toPx()),
+                    5f.dp.toPx()
                 )
             }
         }
@@ -211,11 +209,9 @@ fun GetDataUI(/*app: ChainSystem, url: String, */ images: Array<ToolBoxItem2>) {
 }
 
 
-@OptIn(ExperimentalTextApi::class)
+//@OptIn(ExperimentalTextApi::class)
 fun DrawScope.drawGraphNode(vnode: VisualNode, imageItem: ImageBitmap, tm: TextMeasurer) {
-    //val textpaint = Paint()
-    //val paint=Paint()
-    //val linePaint = Paint()
+
 
     //textpaint.textSize = 48f
 
@@ -254,15 +250,16 @@ fun DrawScope.drawGraphNode(vnode: VisualNode, imageItem: ImageBitmap, tm: TextM
         val c = androidx.compose.ui.graphics.Color.Black
         this.drawOval(
             c,
-            Offset(left, top),
-            Size(xsize.toFloat(), ysize.toFloat()),
-            1.0f,
-            style = Stroke(5f)
+            Offset(left.dp.toPx(), top.dp.toPx()),
+            //Size(xsize.toFloat(), ysize.toFloat()),
+            Size(xsize.dp.toPx(), ysize.dp.toPx()),
+            1.0f.dp.toPx(),
+            style = Stroke(5f.dp.toPx())
         )
     }
 
     this.drawText(
-        tm, vnode.tb.text, Offset(vnode.point.x, vnode.point.y + 50f), style = TextStyle(
+        tm, vnode.tb.text, Offset(vnode.point.x.dp.toPx(), (vnode.point.y + 50f).dp.toPx()), style = TextStyle(
             fontSize = 48.sp
         )
     )//, textpaint)
@@ -275,26 +272,24 @@ fun Clear(
     //canvas: Canvas,
     selectedPoint: MutableState<Offset>,
     textNote: MutableState<String>
-): Unit {
+) {
     ChainSystem.Clear()//app.Clear()
     VisualElements.Clear()
     //Canvas(modifier = Modifier.fillMaxSize()){    }//canvas.Clear()
     selectedPoint.value = Offset.Zero
     textNote.value = "--"
-
 }
 
 /**
  * Update application data, also in VisualElements
- * @param App main application data :ChainSystem
  * @param selected ToolBoxItem2 that user has selected to be added
- * @param event Coordinates on canvas, place where item is added
+ * @param hitOffset Coordinates on canvas, place where item is added
  * @param previousPoint previous point clicked . This value is returned
  */
 fun updateChain(
     //App: ChainSystem,
     selected: ToolBoxItem2,
-    event: Offset,
+    hitOffset: Offset,
     previousPoint: MutableState<Offset>,
     textNote: MutableState<String>
 ) {
@@ -310,11 +305,17 @@ fun updateChain(
         Log.d("APP", selected.text + "(of " + selectedNode.Nodes.size + ")")
         //TODO: Hydrogen autofill when new >1 link node is selected
         // latest node is shown with border
-        if (!selectedNode.IsFull(selected.text)) {
+        if (!selectedNode.IsFull()) {
             ResetStrokes()
-            Add(VisualNode(event/*.x, event.y*/, Size.Zero, selected, true)) // null was shape
+            Add(
+                VisualNode(
+                    hitOffset /*Offset(hitOffset.x, hitOffset.y)*/,
+                    selected,
+                    true
+                )
+            ) // null was shape
         } else {
-            Add(VisualNode(event/*.x, event.y*/, Size.Zero, selected))
+            Add(VisualNode(hitOffset, selected))
         }
 
         if (selected.text == "OH") {
@@ -322,11 +323,11 @@ fun updateChain(
         }
 
         if (previousPoint.value != Offset.Zero) { //.value.x != 0f && previousPoint.value.y != 0f) {
-            AddLine(event /*Offset(event.x, event.y)*/, previousPoint.value)
+            AddLine(hitOffset /*Offset(event.x, event.y)*/, previousPoint.value)
         }
         if (!selectedNode.IsFull()) {
             previousPoint.value =
-                event//Offset( event.x, event.y ) // for next use, remember position for line
+                hitOffset//Offset( event.x, event.y ) // for next use, remember position for line
         }
         if (ChainSystem.IsComplete() || ChainSystem.CountAndMatchKnown() != "?") {
             textNote.value = ChainSystem.toString(true)//textView.text = App.toString(true)
@@ -338,7 +339,6 @@ fun updateChain(
 /**
  * actual REST reader
  * @param url base address
- * @param App Application object initialized with data received
  */
 fun getRestData(
     url: String,
