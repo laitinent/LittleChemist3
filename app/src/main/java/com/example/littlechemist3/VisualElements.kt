@@ -35,7 +35,5 @@ class VisualElements {
                 it.Current = false
             }
         }
-
-
     }
 }

@@ -66,13 +66,6 @@ class ChainSystem/*(knownData: String)*/ {
             return Chain.isEmpty()
         }
 
-
-        /*
-    public void Add(string s)  {
-        var n = new Node(s);
-        Chain.Add(n);
-        previous = n;
-    }*/
 /*
 * Use run for executing a block of code with a different context: In your Link function, you're executing a block of code with n as the context.
 * You can use run function for this purpose which is more idiomatic in Kotlin.
@@ -113,33 +106,6 @@ Use getOrDefault for handling exceptions: In your Link function, you're catching
                 previous = n
             }
 
-            /* not used, using OH  type instead
-        // O+H -> OH when last
-        if(false)//Chain.Count > 2 && IsComplete() && previous.Text == "O" && n.Text == "H") {
-            // TODO: CH3OH -> C still has extra O (changes to extra OH)
-            // Replace O with OH, don't add H
-            Node ohnode = new("OH");
-            // previous = "O"
-            if (previous?.Nodes.Count > 0) {
-                ohnode.AddLink(previous?.Nodes[0]); // Nodes[0] links back
-                //TODO: fix
-                var index = previous.Nodes[0].Nodes.FindIndex(n => n.Id == ohnode.Id);
-                if(index >= 0) { previous.Nodes[0].Nodes[index] = ohnode; }
-                //if (!previous?.Nodes[0].Nodes.Contains(ohnode))
-                //{
-                //previous?.Nodes[0].Nodes.Add(ohnode);
-                //}
-                // replace node when someone links to "O"
-                var masternode = FindNode(previous.Id);
-                var index2 = masternode.Nodes.FindIndex(n=> n.Id ==previous.Id);
-                masternode.Nodes[index2] = ohnode;
-            }
-            Chain[^1] = ohnode;
-
-        }
-        else
-        {
-        */
             Chain.add(n)
             //}
             return n
@@ -199,23 +165,6 @@ You can use joinToString function for this purpose which is more idiomatic in Ko
             //var s = "";
             when {
                 formatted -> {
-                    /*
-                    val counts = mutableMapOf<String, Int>()
-                    //numbersMap.put("three", 3)
-                    //numbersMap["one"] = 11
-                    //val counts = dictionaryOf<string, int>();
-
-                    // count
-                    for (n in Chain) {
-                        if (!counts.containsKey(n.Text)) { counts[n.Text] = 1;
-                        } else {  counts[n.Text] = counts[n.Text]!!.plus(1);   }
-                    }
-
-                    for (item in counts) {
-                        s += if (item.value > 1) { "${item.key}${item.value}";
-                        } else { item.key; }
-                    }*/
-
                     var s = countElements()
                     s = MatchKnown(s)//, counts);
                     if (IsComplete()) {
@@ -285,7 +234,6 @@ You can use joinToString function for this purpose which is more idiomatic in Ko
         private val formulaItems = mutableListOf<FormulaItem>()
 
         private fun MatchKnown(s: String, counts: MutableMap<String, Int>): String {
-            //for (item in counts) {
 
             counts.forEach {
                 formulaItems.add(FormulaItem(it.key, it.value))  // was item
@@ -293,28 +241,8 @@ You can use joinToString function for this purpose which is more idiomatic in Ko
             val list2 = formulaItems.sortedWith(compareBy { it.Code }) // not used?
 
             val ss = ParseNodeText(s)
-            /*TODO: C2H5OH vs C2H6O
-        // Replaced by list from net https://laitinent.gitihub.io/moleculelist.csv
-        val v: String = when (ss) {
-            "H2O" -> " (Vesi)"
-            "OH2" -> "H2O (Vesi)"
-            "CO2" -> "Hiilidioksidi"
-            "CH2O" -> "Formaldehydi"
-            "C2H6" -> "Etaani"
-            "C2H5OH" -> "Etanoli"
-            "C3H6O" -> "Asetoni"
-            "CH4" -> "Metaani"
-            "C3H8" -> "Propaani"  // lines from 2nd C->H mismatch
-            //"CH3CH2CH3" => "Propaani",
-            "CH3OH" -> "Metanoli"
-            "NH3" -> "Ammoniakki"
-            "NH2OH" -> "Hydroksyyliamiini"
-            "CHN" -> "Syaanivety/ Sinihappo"
-            "CNH" -> "Syaanivety/ Sinihappo"
-            "CH3CN" -> "Asetonitriili"
-            else -> s
-        };
-        return v;*/
+            //TODO: C2H5OH vs C2H6O
+
             return if (Known.containsKey(ss)) {
                 Known[ss]!!
             } else ""

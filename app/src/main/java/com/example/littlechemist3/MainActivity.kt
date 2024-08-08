@@ -58,21 +58,12 @@ import retrofit2.Retrofit
 import retrofit2.converter.scalars.ScalarsConverterFactory
 import retrofit2.http.GET
 
-/*interface PortsService {
-    @GET("winter-navigation/ports")
-    fun getCurrentPortsData( /*  @Query("lat") lat: String  */): Call<Ports>
-}*/
-
 interface GitHubService {
     @GET("moleculelist.csv")
     fun listRepos(/*@Path("user") user: String?*/): Call<String?>?  // could be "suspend"
 }
 
 class MainActivity : ComponentActivity() {
-    //var retvals = ""
-    //private var selected: ToolBoxItem2? = null//ToolBoxItem? = null
-    //val app = mutableStateOf(ChainSystem(""))
-
 
     private val images =  // compose: painter=painterResource(R.drawable.nnn)
         arrayOf(  // was R.drawable.yellowball
@@ -114,8 +105,7 @@ fun GetDataUI(/*app: ChainSystem, url: String, */ images: Array<ToolBoxItem2>) {
     var previousPoint = remember { mutableStateOf(Offset.Zero) }
     val list2 = remember { mutableStateListOf<VisualNode>() }
 
-    //if (selected != null) {
-    //var selectedPoint = Offset.Zero//PointF()
+
     var image: ImageBitmap? = ImageBitmap.imageResource(selected.drawableResId)
     //}
 
@@ -124,7 +114,7 @@ fun GetDataUI(/*app: ChainSystem, url: String, */ images: Array<ToolBoxItem2>) {
         imageResources.add(ImageBitmap.imageResource(res.drawableResId)) //vxcfdsew
     }
 
-    //getRestData(url, /*response,*/ app)
+
     Column {
         LazyRow {
             items(images) {
@@ -173,19 +163,7 @@ fun GetDataUI(/*app: ChainSystem, url: String, */ images: Array<ToolBoxItem2>) {
                     }
                 })
         {
-            //if (image != null)
-            //{
-            //val io = IntOffset(offset.value.x.toLong().toInt(), offset.value.y.toLong().toInt())
-            //Log.d("canvas","Int: $io.toString()")
-            //see https://developer.android.com/jetpack/compose/graphics/images/custompainter
-            /*drawImage(
-                image = image,
-                srcOffset = IntOffset.Zero,
-                dstOffset = io,
-                srcSize = IntSize(image.width, image.height),
-                dstSize = IntSize(50, 50)
-            )*/
-            //}
+
             Log.d("COUNT", VisualElements.lista.size.toString() + " nodes")
             VisualElements.lista.forEach { vnode ->
                 val d = images.toList().find { it.drawableResId == vnode.tb.drawableResId }
@@ -212,30 +190,11 @@ fun GetDataUI(/*app: ChainSystem, url: String, */ images: Array<ToolBoxItem2>) {
 //@OptIn(ExperimentalTextApi::class)
 fun DrawScope.drawGraphNode(vnode: VisualNode, imageItem: ImageBitmap, tm: TextMeasurer) {
 
-
-    //textpaint.textSize = 48f
-
-    //paint.color= Color.RED
-    //paint.strokeWidth = 5f
-
-    //for(vnode in VisualElements.lista) {
     val xsize = 100//(vnode.s.width  ) /2
     val ysize = 100 //vnode.s.height/2
     val left = (vnode.point.x - (xsize / 2))
     val top = (vnode.point.y - (ysize / 2))
-    //val right = (vnode.point.x+xsize)
-    //val bottom = (vnode.point.y+ysize)
 
-    // show active node with border(=stroke)
-    //paint.color = vnode.tb.color
-    //paint.style = Paint.Style.FILL
-    //canvas.drawOval(vnode.x-25, vnode.y-25,vnode.x+vnode.vnode.width/2, vnode.y+vnode.vnode.height/2, paint )
-    //val d = resources.getDrawable(R.drawable.redball, null)
-
-    //painterResource(id = vnode.tb.drawableResId)
-    //Log.d("MYVIEW", "${d.intrinsicHeight} x ${d.intrinsicWidth}")
-
-    //d.setBounds(left.toInt(), top.toInt(), right.toInt(), bottom.toInt())
     Log.d("DRAW", "($left, $top) ")
 
     this.drawImage(
@@ -268,14 +227,12 @@ fun DrawScope.drawGraphNode(vnode: VisualNode, imageItem: ImageBitmap, tm: TextM
 
 //@Composable
 fun Clear(
-    //app: ChainSystem,
-    //canvas: Canvas,
     selectedPoint: MutableState<Offset>,
     textNote: MutableState<String>
 ) {
     ChainSystem.Clear()//app.Clear()
     VisualElements.Clear()
-    //Canvas(modifier = Modifier.fillMaxSize()){    }//canvas.Clear()
+
     selectedPoint.value = Offset.Zero
     textNote.value = "--"
 }
@@ -295,12 +252,7 @@ fun updateChain(
 ) {
     //TODO: when iscomplete, count and match not executed ?
     if (ChainSystem.isEmpty() || !(ChainSystem.IsComplete() || ChainSystem.CountAndMatchKnown() != "?")) {//&& selected != null) {
-        // pick item from toolbar
-        //if (event.y < 200f) {
-        //selected = ToolHit(event.x, event.y)
-        //} else {
-        // Use picked tool item
-        //Add(VisualNode(event.x, event.y, shape, selectedText))
+
         val selectedNode = ChainSystem.Link(selected.text)
         Log.d("APP", selected.text + "(of " + selectedNode.Nodes.size + ")")
         //TODO: Hydrogen autofill when new >1 link node is selected
@@ -342,8 +294,6 @@ fun updateChain(
  */
 fun getRestData(
     url: String,
-    //retvals: MutableState<String>,
-    //App: MutableState<ChainSystem>?
 ): String {   // TODO: mutableState in parameter
 
     // add auth header to request
@@ -359,7 +309,7 @@ fun getRestData(
         }
         .build()
 
-    //lateinit var App: ChainSystem
+
     val retrofit = Retrofit.Builder()
         .baseUrl(url)
         .addConverterFactory(ScalarsConverterFactory.create()) //GsonConverterFactory.create())//
@@ -371,8 +321,7 @@ fun getRestData(
     val call = service.listRepos()//getCurrentPortsData()
 
     // Fetch and print a list of the contributors to the library.
-    //var retvals: String? = ""
-    //retvals = call.execute().body()!!
+
     call?.enqueue(object : Callback<String?> {
         //Ports> {
         override fun onResponse(
@@ -381,15 +330,10 @@ fun getRestData(
         ) {//Call<Ports>, response: Response<Ports>) {//
             if (response.code() == 200) {//response.isSuccessful) {
                 val responseString = response.body()!!
-                //retvals.value = responseString//.features[0].properties.name // used only for testing
-                /*App?.value = */ChainSystem.setKnownData(responseString)//ChainSystem(responseString)
+                ChainSystem.setKnownData(responseString)//ChainSystem(responseString)
 
                 Log.d("REPOS", responseString)
-                /*helloTextView.text = "Ready to add Atoms!"
-                toolBox2.isEnabled=true
-                setCustomAdapter(images, true, toolBox2) // was on line 79
-                setTouchListenetToApp(shape) // was on line 95
-                 */
+
             }
         }
 
@@ -403,9 +347,6 @@ fun getRestData(
 // below not used
 @Composable
 fun Greeting(name: String) {//}, modifier: Modifier = Modifier) {
-    //var teksti = remember { mutableStateOf("") }
-    //var offset by remember { mutableStateOf(Offset(0f, 0f)) }
-    //val lista = getRestData("https://meri.digitraffic.fi/api/v1/", /*teksti,*/ null)
 
 }
 
